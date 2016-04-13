@@ -126,7 +126,7 @@ public class GPSTracker implements LocationListener {
                     Toast.makeText(mContext,"Next check is "+MIN_TIME_BW_UPDATES/1000+" seconds after",Toast.LENGTH_SHORT).show();
                 }else{
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    MIN_TIME_BW_UPDATES = (long)(distance-0.2) * 1000 * 60 * 10 ;
+                    MIN_TIME_BW_UPDATES = (long)(distance+0.01) * 1000 * 60 * 10 ;
                     Toast.makeText(mContext,"Phone is normal now!",Toast.LENGTH_SHORT ).show();
                     Toast.makeText(mContext,"Next check is "+MIN_TIME_BW_UPDATES/1000+" seconds after",Toast.LENGTH_SHORT).show();
                 }
