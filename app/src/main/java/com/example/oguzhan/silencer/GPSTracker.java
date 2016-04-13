@@ -110,6 +110,10 @@ public class GPSTracker implements LocationListener {
 
         Database db = new Database(mContext);
         ArrayList<LocRecord> locRecords = db.getLocations();
+
+        //if there is no recorded locations return
+        if(locRecords.size()==0) return;
+
         double distance;
         double min = 0;
         for (LocRecord locRecord : locRecords
@@ -123,6 +127,7 @@ public class GPSTracker implements LocationListener {
         }
         distance = min;
         audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+
         if (distance < 0.2&&distance> 0) {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
             MIN_TIME_BW_UPDATES = 30*1000;
