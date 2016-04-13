@@ -26,13 +26,12 @@ public class GPSTracker implements LocationListener {
     public boolean canGetLocation = false;
 
     AudioManager audioManager = null;
-	//asdjasdkas
     Location location;
     double latitude;
     double longtitude;
 
     // The minimum distance to change Updates in meters
-    public static long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+    public static long MIN_DISTANCE_CHANGE_FOR_UPDATES = 200; // 10 meters
 
     // The minimum time between updates in milliseconds
     public static long MIN_TIME_BW_UPDATES = 1; // 1 minute
@@ -111,26 +110,31 @@ public class GPSTracker implements LocationListener {
 
         Database db = new Database(mContext);
         ArrayList<LocRecord> locRecords = db.getLocations();
+        double distance;
+        double min = 0;
         for (LocRecord locRecord : locRecords
-             ) {
+                ) {
             double recordedLat = locRecord.getLat();
             double recordedLon = locRecord.getLon();
-            audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-            double distance = DistanceCalculator.distance(lat, lon, recordedLat, recordedLon, "K");
-            distance = Math.abs(distance);
 
-                if(distance < 0.1){
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-                    MIN_TIME_BW_UPDATES = 10 * 60 *1000;
-                    Toast.makeText(mContext,"Phone is silent now!",Toast.LENGTH_SHORT ).show();
-                    Toast.makeText(mContext,"Next check is "+MIN_TIME_BW_UPDATES/1000+" seconds after",Toast.LENGTH_SHORT).show();
-                }else{
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    MIN_TIME_BW_UPDATES = (long)(distance+0.01) * 1000 * 60 * 10 ;
-                    Toast.makeText(mContext,"Phone is normal now!",Toast.LENGTH_SHORT ).show();
-                    Toast.makeText(mContext,"Next check is "+MIN_TIME_BW_UPDATES/1000+" seconds after",Toast.LENGTH_SHORT).show();
-                }
+            distance = DistanceCalculator.distance(lat, lon, recordedLat, recordedLon, "K");
+            distance = Math.abs(distance);
+            if (min < distance) min = distance;
         }
+        distance = min;
+        audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        if (distance < 0.2&&distance> 0) {
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+            MIN_TIME_BW_UPDATES = 30*1000;
+            Toast.makeText(mContext, "Silent  dist:"+distance, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Next check is " + MIN_TIME_BW_UPDATES/1000 + " seconds after", Toast.LENGTH_SHORT).show();
+        } else {
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            MIN_TIME_BW_UPDATES = (long) (distance + 0.01) * 1000 * 60 * 10;
+            Toast.makeText(mContext, "Normal dist:"+distance, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Next check is " + MIN_TIME_BW_UPDATES / 1000 + " seconds after", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
